@@ -12,6 +12,12 @@ workflows:
         APPLE_TEAM_ID: "PWC93S9KK8"
         EMBERWALL_BUNDLE_ID: "com.rahaa.emberwall"
     scripts:
+      - name: Unpack the Emberwall source archive
+        script: |
+          cd "$CM_BUILD_DIR"
+          unzip -q emberwall-source.zip -d .
+          test -f project.godot
+          test -f ci/install_godot.sh
       - name: Install Godot 4.7.2 and iOS export template
         script: bash ci/install_godot.sh
       - name: Export the iOS Xcode project
