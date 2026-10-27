@@ -6,8 +6,6 @@
     environment:
       xcode: "26.6"
       ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.rahaa.emberwall
         provisioning_profiles:
           - emberwall-app-store
         certificates:
