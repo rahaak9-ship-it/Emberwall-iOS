@@ -207,7 +207,18 @@
         script: |
           set -euo pipefail
           cd "$CM_BUILD_DIR"
-          APK_URL="$(curl -fsS --retry 3 -F "file=@build/android/Emberwall-debug.apk" https://x0.at)"
+          APK=build/android/Emberwall-debug.apk
+          ls -lh "$APK"
+          RESP="$(curl -fsS --retry 2 -F "files[]=@$APK" https://uguu.se/upload.php || true)"
+          echo "$RESP"
+          APK_URL="$(printf '%s' "$RESP" | sed -n 's/.*"url":"\([^"]*\)".*/\1/p' | sed 's#\\/#/#g')"
+          if [ -z "$APK_URL" ]; then
+            RESP="$(curl -fsS --retry 2 -F "file=@$APK" https://tmpfiles.org/api/v1/upload || true)"
+            echo "$RESP"
+            REL="$(printf '%s' "$RESP" | sed -n 's#.*"url":"https://tmpfiles.org/\([^"]*\)".*#\1#p')"
+            if [ -n "$REL" ]; then APK_URL="https://tmpfiles.org/dl/$REL"; fi
+          fi
+          test -n "$APK_URL"
           echo "APK_URL=$APK_URL" | tee build/apk-url.txt
     artifacts:
       - build/android/*.apk
