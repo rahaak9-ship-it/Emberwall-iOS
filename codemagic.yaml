@@ -203,8 +203,15 @@
           "$GODOT_BIN" --headless --path "$CM_BUILD_DIR" --export-debug "Android Debug" "build/android/Emberwall-debug.apk" 2>&1 | tee build/android-export.log
           test -s build/android/Emberwall-debug.apk
           ls -lh build/android/Emberwall-debug.apk
+      - name: Upload the APK to a public URL
+        script: |
+          set -euo pipefail
+          cd "$CM_BUILD_DIR"
+          APK_URL="$(curl -fsS --retry 3 -F "file=@build/android/Emberwall-debug.apk" https://x0.at)"
+          echo "APK_URL=$APK_URL" | tee build/apk-url.txt
     artifacts:
       - build/android/*.apk
+      - build/apk-url.txt
       - build/*.log
 
 
