@@ -120,12 +120,13 @@
             keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -alias androiddebugkey -storepass android -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
           fi
           ls -d "$ANDROID_HOME"/build-tools/* 2>/dev/null | tail -n 3 || true
-      - name: Append the Android export preset
+      - name: Write the Android export preset
         script: |
           set -euo pipefail
           cd "$CM_BUILD_DIR"
-          cat >> export_presets.cfg <<'PRESET'
-          [preset.2]
+          rm -f export_presets.cfg
+          cat > export_presets.cfg <<'PRESET'
+          [preset.0]
           name="Android Debug"
           platform="Android"
           dedicated_server=false
@@ -141,7 +142,7 @@
           encrypt_pck=false
           encrypt_directory=false
           script_export_mode=2
-          [preset.2.options]
+          [preset.0.options]
           custom_template/debug=""
           custom_template/release=""
           gradle_build/use_gradle_build=false
@@ -190,6 +191,9 @@
           command_line/extra_args=""
           permissions/custom_permissions=PackedStringArray()
           PRESET
+          echo "--- preset head ---"
+          head -n 6 export_presets.cfg
+          grep -c "Android Debug" export_presets.cfg
       - name: Export the debug APK
         script: |
           set -euo pipefail
